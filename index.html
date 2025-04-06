@@ -3,38 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Quality Control Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>AI Quality Control Analyst</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
         :root {
             --primary: #4361ee;
             --primary-light: #4cc9f0;
             --secondary: #3a0ca3;
             --accent: #f72585;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+            
+            /* Light Theme */
             --text: #2b2d42;
             --text-light: #8d99ae;
             --bg: #f8f9fa;
             --card-bg: #ffffff;
             --border: #e9ecef;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --error: #f44336;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .dark-mode {
-            --primary: #4cc9f0;
-            --primary-light: #4895ef;
-            --secondary: #3a0ca3;
-            --accent: #f72585;
+            /* Dark Theme */
             --text: #f8f9fa;
             --text-light: #adb5bd;
             --bg: #121212;
             --card-bg: #1e1e1e;
             --border: #333333;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
         }
 
         * {
@@ -44,7 +45,7 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
@@ -54,18 +55,123 @@
             transition: var(--transition);
         }
 
-        /* Main Chat Container */
-        .chat-container {
+        /* Main Container */
+        .qc-container {
             width: 100%;
-            max-width: 1000px;
-            height: 90vh;
+            max-width: 1200px;
+            height: 95vh;
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: 24px;
             box-shadow: var(--shadow);
             display: flex;
-            flex-direction: column;
             overflow: hidden;
             position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--secondary), var(--primary));
+            color: white;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-title h2 {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-title p {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .nav-menu {
+            list-style: none;
+            margin-top: 24px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .metrics-panel {
+            margin-top: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .metrics-title {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .metric-value {
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Chat Header */
@@ -76,36 +182,12 @@
             align-items: center;
             border-bottom: 1px solid var(--border);
             background: var(--card-bg);
-            z-index: 10;
+            z-index: 5;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .header-title h1 {
-            font-size: 1.3rem;
-            font-weight: 700;
+        .chat-title {
+            font-weight: 600;
             color: var(--primary);
-        }
-
-        .header-title p {
-            font-size: 0.7rem;
-            color: var(--text-light);
         }
 
         .header-actions {
@@ -113,11 +195,11 @@
             gap: 12px;
         }
 
-        .action-btn {
+        .header-btn {
             background: none;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -125,34 +207,24 @@
             cursor: pointer;
             color: var(--text-light);
             transition: var(--transition);
-            position: relative;
         }
 
-        .action-btn:hover {
+        .header-btn:hover {
             background: rgba(0, 0, 0, 0.05);
             color: var(--text);
         }
 
-        .dark-mode .action-btn:hover {
+        .dark-mode .header-btn:hover {
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .action-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 16px;
-            height: 16px;
-            background: var(--accent);
-            border-radius: 50%;
-            color: white;
-            font-size: 0.6rem;
+        /* Chat Area */
+        .chat-area {
+            flex-grow: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            overflow: hidden;
         }
 
-        /* Chat Messages */
         .chat-messages {
             flex-grow: 1;
             padding: 20px;
@@ -160,7 +232,6 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            scroll-behavior: smooth;
         }
 
         .chat-messages::-webkit-scrollbar {
@@ -178,7 +249,7 @@
 
         /* Messages */
         .message {
-            max-width: 80%;
+            max-width: 75%;
             padding: 16px 20px;
             border-radius: 18px;
             animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -213,30 +284,52 @@
             text-align: right;
         }
 
-        /* Media Attachments */
-        .media-attachment {
-            margin-top: 12px;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
+        /* Analytics Panel */
+        .analytics-panel {
+            width: 400px;
+            border-left: 1px solid var(--border);
+            background: var(--card-bg);
+            padding: 20px;
+            overflow-y: auto;
+            transition: var(--transition);
+            transform: translateX(100%);
         }
 
-        .media-image {
-            max-width: 100%;
-            border-radius: 12px;
-            display: block;
-            transition: transform 0.3s ease;
-            cursor: zoom-in;
+        .analytics-panel.active {
+            transform: translateX(0);
         }
 
-        .media-image:hover {
-            transform: scale(1.02);
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .media-caption {
-            font-size: 0.8rem;
+        .close-analytics {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
             color: var(--text-light);
-            margin-top: 6px;
+        }
+
+        .chart-container {
+            margin-bottom: 24px;
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* Input Area */
@@ -294,31 +387,6 @@
         .message-input:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-
-        .voice-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .voice-btn.listening {
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(67, 97, 238, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
         }
 
         .send-btn {
@@ -533,6 +601,32 @@
             color: var(--error);
         }
 
+        /* Media Attachments */
+        .media-attachment {
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .media-image {
+            max-width: 100%;
+            border-radius: 12px;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .media-image:hover {
+            transform: scale(1.02);
+        }
+
+        .media-caption {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 6px;
+        }
+
         /* Image Modal */
         .modal {
             position: fixed;
@@ -579,44 +673,53 @@
             cursor: pointer;
         }
 
-        /* Voice Recognition Status */
-        .voice-status {
+        /* Analytics Toggle */
+        .analytics-toggle {
             position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--card-bg);
-            padding: 12px 20px;
-            border-radius: 24px;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
             box-shadow: var(--shadow);
+            transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 8px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            justify-content: center;
+            z-index: 5;
         }
 
-        .voice-status.active {
-            opacity: 1;
-        }
-
-        .voice-pulse {
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: pulseSmall 1s infinite;
-        }
-
-        @keyframes pulseSmall {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
+        .analytics-toggle:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
         }
 
         /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .analytics-panel {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
         @media (max-width: 768px) {
-            .chat-container {
+            .qc-container {
                 height: 100vh;
                 border-radius: 0;
             }
@@ -628,64 +731,170 @@
     </style>
 </head>
 <body>
-    <div class="chat-container" id="chat-container">
-        <div class="chat-header">
-            <div class="logo-container">
-                <div class="logo">
-                    <i class="fas fa-robot"></i>
+    <div class="qc-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-microscope"></i>
                 </div>
-                <div class="header-title">
-                    <h1>QC Vision Assistant</h1>
-                    <p>AI-powered defect detection</p>
+                <div class="sidebar-title">
+                    <h2>QC Analyst</h2>
+                    <p>AI-Powered Quality Control</p>
                 </div>
             </div>
-            <div class="header-actions">
-                <button class="action-btn" id="theme-toggle">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button class="action-btn" id="help-btn">
-                    <i class="fas fa-question"></i>
-                </button>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-comment-alt"></i>
+                        <span>Chat Assistant</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Quality Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-tasks"></i>
+                        <span>Defect Tracker</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="metrics-panel">
+                <div class="metrics-title">
+                    <span>QUALITY METRICS</span>
+                    <i class="fas fa-sync-alt" style="cursor: pointer;"></i>
+                </div>
+                <div class="metric-item">
+                    <span>Defect Rate</span>
+                    <span class="metric-value">2.1%</span>
+                </div>
+                <div class="metric-item">
+                    <span>First Pass Yield</span>
+                    <span class="metric-value">95.4%</span>
+                </div>
+                <div class="metric-item">
+                    <span>Avg. Resolution</span>
+                    <span class="metric-value">1.3 days</span>
+                </div>
+                <div class="metric-item">
+                    <span>Customer Returns</span>
+                    <span class="metric-value">0.8%</span>
+                </div>
             </div>
         </div>
-        <div class="chat-messages" id="chat-messages">
-            <div class="message bot-message">
-                <p>👋 Welcome to <strong>QC Vision Assistant</strong>!</p>
-                <p>I can help you detect and analyze product defects using:</p>
-                <ul style="margin-top: 8px; padding-left: 20px;">
-                    <li>📸 Image recognition</li>
-                    <li>🎤 Voice commands</li>
-                    <li>🔍 AI-powered analysis</li>
-                </ul>
-                <p style="margin-top: 12px;">How can I assist you today?</p>
-                <div class="quick-replies">
-                    <button class="quick-reply" onclick="sendQuickReply('Report a defect')">Report a defect</button>
-                    <button class="quick-reply" onclick="sendQuickReply('Analyze an image')">Analyze an image</button>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="chat-header">
+                <h2 class="chat-title">Quality Control Assistant</h2>
+                <div class="header-actions">
+                    <button class="header-btn" id="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="header-btn" id="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
-                <div class="message-time">Just now</div>
             </div>
-        </div>
-        <div class="input-area">
-            <div class="input-container">
-                <button class="attachment-btn" id="attachment-btn">
-                    <i class="fas fa-camera"></i>
-                </button>
-                <input type="file" id="file-input" accept="image/*" style="display: none;">
-                <input type="text" class="message-input" id="message-input" placeholder="Type or speak your message...">
-                <button class="voice-btn" id="voice-btn">
-                    <i class="fas fa-microphone"></i>
+            
+            <div class="chat-area">
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-message">
+                        <p>🔍 <strong>Welcome to QC Analyst Pro</strong></p>
+                        <p>I'm your AI-powered quality control assistant. I can help you:</p>
+                        <ul style="margin-top: 8px; padding-left: 20px;">
+                            <li>Analyze product defects with precision</li>
+                            <li>Provide data-driven solutions</li>
+                            <li>Generate real-time quality reports</li>
+                            <li>Predict potential quality issues</li>
+                        </ul>
+                        <p style="margin-top: 12px;">How can I assist you today?</p>
+                        <div class="quick-replies">
+                            <button class="quick-reply" onclick="sendQuickReply('Report a defect')">Report a defect</button>
+                            <button class="quick-reply" onclick="sendQuickReply('View quality metrics')">View metrics</button>
+                            <button class="quick-reply" onclick="sendQuickReply('Analyze an image')">Analyze image</button>
+                        </div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+                
+                <!-- Analytics Panel -->
+                <div class="analytics-panel" id="analytics-panel">
+                    <div class="analytics-header">
+                        <h3>Quality Analytics Dashboard</h3>
+                        <button class="close-analytics" id="close-analytics">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Defect Trend (Last 30 Days)</span>
+                        </div>
+                        <canvas id="defectTrendChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Defects by Category</span>
+                        </div>
+                        <canvas id="defectCategoryChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Defect Severity Distribution</span>
+                        </div>
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-industry"></i>
+                            <span>Production Line Performance</span>
+                        </div>
+                        <div id="linePerformanceChart"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-container">
+                    <button class="attachment-btn" id="attachment-btn">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    <input type="text" class="message-input" id="message-input" placeholder="Type your message...">
+                </div>
+                <button class="send-btn" id="send-btn">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
-            <button class="send-btn" id="send-btn">
-                <i class="fas fa-paper-plane"></i>
+            
+            <!-- Analytics Toggle -->
+            <button class="analytics-toggle" id="analytics-toggle">
+                <i class="fas fa-chart-bar"></i>
             </button>
         </div>
-        <div class="voice-status" id="voice-status">
-            <div class="voice-pulse"></div>
-            <span>Listening...</span>
-        </div>
     </div>
-
+    
     <!-- Image Modal -->
     <div class="modal" id="image-modal">
         <div class="modal-content">
@@ -698,23 +907,24 @@
 
     <script>
         // DOM Elements
-        const chatContainer = document.getElementById('chat-container');
+        const sidebar = document.getElementById('sidebar');
         const chatMessages = document.getElementById('chat-messages');
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
-        const voiceBtn = document.getElementById('voice-btn');
         const attachmentBtn = document.getElementById('attachment-btn');
         const fileInput = document.getElementById('file-input');
         const themeToggle = document.getElementById('theme-toggle');
-        const voiceStatus = document.getElementById('voice-status');
+        const menuToggle = document.getElementById('menu-toggle');
+        const analyticsPanel = document.getElementById('analytics-panel');
+        const analyticsToggle = document.getElementById('analytics-toggle');
+        const closeAnalytics = document.getElementById('close-analytics');
         const imageModal = document.getElementById('image-modal');
         const modalImage = document.getElementById('modal-image');
         const closeModal = document.getElementById('close-modal');
 
-        // Voice Recognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition;
-        let isListening = false;
+        // Initialize Charts
+        let defectTrendChart, defectCategoryChart, severityChart;
+        let linePerformanceChart;
 
         // Conversation State
         let conversationState = {
@@ -725,6 +935,26 @@
             imageAnalysis: false
         };
 
+        // Quality Data (Sample)
+        const qualityData = {
+            defectTrend: {
+                labels: Array.from({length: 30}, (_, i) => `Day ${i+1}`),
+                data: Array.from({length: 30}, () => Math.floor(Math.random() * 10) + 1)
+            },
+            defectCategories: {
+                labels: ['Material', 'Assembly', 'Packaging', 'Design', 'Electrical', 'Surface'],
+                data: [25, 18, 12, 8, 5, 32]
+            },
+            severityDistribution: {
+                labels: ['Low', 'Medium', 'High', 'Critical'],
+                data: [45, 30, 15, 10]
+            },
+            linePerformance: {
+                labels: ['Line A', 'Line B', 'Line C', 'Line D'],
+                data: [98.2, 95.7, 97.5, 94.8]
+            }
+        };
+
         // Defect Database (AI-Powered Solutions)
         const defectDatabase = {
             types: [
@@ -732,32 +962,68 @@
                 "Design Issue", "Electrical Fault", "Surface Defect", "Other"
             ],
             visualDefects: {
-                "crack": "Material Crack",
-                "scratch": "Surface Scratch",
-                "dent": "Physical Dent",
-                "misalignment": "Assembly Misalignment",
-                "discoloration": "Material Discoloration",
-                "corrosion": "Metal Corrosion"
+                "crack": { type: "Material Crack", severity: "high" },
+                "scratch": { type: "Surface Scratch", severity: "low" },
+                "dent": { type: "Physical Dent", severity: "medium" },
+                "misalignment": { type: "Assembly Misalignment", severity: "high" },
+                "discoloration": { type: "Material Discoloration", severity: "medium" },
+                "corrosion": { type: "Metal Corrosion", severity: "high" }
             },
             solutions: {
                 "Material Flaw": {
-                    low: "Increase material inspection frequency. Implement spot checks.",
-                    medium: "Contact supplier with defect evidence. Conduct 100% inspection.",
-                    high: "🚨 Quarantine affected products. Initiate full recall."
+                    low: {
+                        solution: "Increase material inspection frequency to 10% sampling rate.",
+                        action: "Implement spot checks for critical material properties.",
+                        prevention: "Review supplier quality reports monthly."
+                    },
+                    medium: {
+                        solution: "Contact supplier with photographic evidence of defects.",
+                        action: "Conduct 100% inspection for affected material batch.",
+                        prevention: "Require material certification for next shipment."
+                    },
+                    high: {
+                        solution: "Immediately quarantine all affected products (Batch #XYZ-789).",
+                        action: "Initiate full recall procedure (Reference QC-2023-045).",
+                        prevention: "Schedule supplier quality audit within 7 days."
+                    }
                 },
                 "Surface Defect": {
-                    low: "Adjust handling procedures. Implement protective measures.",
-                    medium: "Review manufacturing process. Retrain staff on handling.",
-                    high: "Stop production line. Implement immediate corrective actions."
+                    low: {
+                        solution: "Adjust handling procedures in packaging area.",
+                        action: "Implement protective corner guards on conveyor belts.",
+                        prevention: "Retrain staff on proper handling techniques."
+                    },
+                    medium: {
+                        solution: "Pause production line for process review.",
+                        action: "Install additional lighting in inspection area.",
+                        prevention: "Implement automated surface scanning at Station 3."
+                    },
+                    high: {
+                        solution: "Stop production and isolate last 4 hours of output.",
+                        action: "Replace worn tooling on CNC machine #4.",
+                        prevention: "Upgrade to diamond-coated cutting tools."
+                    }
                 }
             }
         };
 
-        // Sample Product Database (for image recognition demo)
+        // Product Database
         const productDatabase = {
-            "ABC-123": "Stainless Steel Valve",
-            "XYZ-456": "Plastic Housing Unit",
-            "DEF-789": "Aluminum Heat Sink"
+            "VAL-2023": {
+                name: "Stainless Steel Valve",
+                specs: "Grade 316L, 2\" NPT, Pressure Rating: 150 PSI",
+                criticalParams: ["Surface finish", "Thread integrity", "Pressure test"]
+            },
+            "HSN-456": {
+                name: "Aluminum Heat Sink",
+                specs: "6061-T6, 120mm x 80mm, Anodized Black",
+                criticalParams: ["Flatness", "Fin thickness", "Coating adhesion"]
+            },
+            "PLA-789": {
+                name: "Plastic Housing",
+                specs: "ABS Injection Molded, UL94 HB",
+                criticalParams: ["Wall thickness", "Gate vestige", "Cosmetic defects"]
+            }
         };
 
         // Initialize Chatbot
@@ -765,33 +1031,16 @@
             // Event Listeners
             sendBtn.addEventListener('click', sendMessage);
             messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
-            voiceBtn.addEventListener('click', toggleVoiceRecognition);
             attachmentBtn.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', handleImageUpload);
             themeToggle.addEventListener('click', toggleTheme);
+            menuToggle.addEventListener('click', toggleSidebar);
+            analyticsToggle.addEventListener('click', toggleAnalytics);
+            closeAnalytics.addEventListener('click', toggleAnalytics);
             closeModal.addEventListener('click', closeImageModal);
 
-            // Initialize voice recognition if available
-            if (SpeechRecognition) {
-                recognition = new SpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                
-                recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    messageInput.value = transcript;
-                    stopVoiceRecognition();
-                };
-                
-                recognition.onerror = (event) => {
-                    console.error('Voice recognition error', event.error);
-                    stopVoiceRecognition();
-                    addBotMessage("Sorry, I didn't catch that. Please try speaking again or type your message.");
-                };
-            } else {
-                voiceBtn.style.display = 'none';
-                addBotMessage("Note: Voice commands are not supported in your browser. Please use text input.");
-            }
+            // Initialize Charts
+            initCharts();
 
             // Load theme preference
             if (localStorage.getItem('theme') === 'dark') {
@@ -801,6 +1050,133 @@
 
             // Auto-focus input
             messageInput.focus();
+        }
+
+        // Initialize Charts
+        function initCharts() {
+            // Defect Trend Chart (Line)
+            const trendCtx = document.getElementById('defectTrendChart').getContext('2d');
+            defectTrendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: qualityData.defectTrend.labels,
+                    datasets: [{
+                        label: 'Defects per Day',
+                        data: qualityData.defectTrend.data,
+                        borderColor: 'rgba(67, 97, 238, 0.8)',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Defects'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Defect Category Chart (Doughnut)
+            const categoryCtx = document.getElementById('defectCategoryChart').getContext('2d');
+            defectCategoryChart = new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: qualityData.defectCategories.labels,
+                    datasets: [{
+                        data: qualityData.defectCategories.data,
+                        backgroundColor: [
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(255, 152, 0, 0.7)',
+                            'rgba(76, 175, 80, 0.7)',
+                            'rgba(33, 150, 243, 0.7)',
+                            'rgba(156, 39, 176, 0.7)',
+                            'rgba(233, 30, 99, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+
+            // Severity Chart (Bar)
+            const severityCtx = document.getElementById('severityChart').getContext('2d');
+            severityChart = new Chart(severityCtx, {
+                type: 'bar',
+                data: {
+                    labels: qualityData.severityDistribution.labels,
+                    datasets: [{
+                        label: 'Defects by Severity',
+                        data: qualityData.severityDistribution.data,
+                        backgroundColor: [
+                            'rgba(76, 175, 80, 0.7)',
+                            'rgba(255, 152, 0, 0.7)',
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(121, 85, 72, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Defects'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Line Performance Chart (ApexCharts)
+            linePerformanceChart = new ApexCharts(document.getElementById("linePerformanceChart"), {
+                series: [{
+                    name: "First Pass Yield",
+                    data: qualityData.linePerformance.data
+                }],
+                chart: {
+                    type: 'radar',
+                    height: 300,
+                    toolbar: {
+                        show: false
+                    }
+                },
+                xaxis: {
+                    categories: qualityData.linePerformance.labels
+                },
+                yaxis: {
+                    min: 90,
+                    max: 100
+                },
+                colors: ['#4361ee'],
+                markers: {
+                    size: 5
+                }
+            });
+            linePerformanceChart.render();
         }
 
         // Send Message
@@ -818,13 +1194,17 @@
         function processConversationStep(message) {
             const lowerMessage = message.toLowerCase();
 
-            // Handle different conversation flows
             if (conversationState.step === 'idle') {
                 if (lowerMessage.includes('report') || lowerMessage.includes('defect')) {
                     startDefectReport();
-                } else if (lowerMessage.includes('analyze') || lowerMessage.includes('image')) {
+                } 
+                else if (lowerMessage.includes('analyze') || lowerMessage.includes('image')) {
                     requestImageAnalysis();
-                } else {
+                }
+                else if (lowerMessage.includes('metric') || lowerMessage.includes('dashboard')) {
+                    showQualityMetrics();
+                }
+                else {
                     sendDefaultResponse();
                 }
             } 
@@ -847,7 +1227,7 @@
             showTypingIndicator();
             setTimeout(() => {
                 removeTypingIndicator();
-                addBotMessage("Let's document this defect. First, what's the <strong>product name</strong> or ID?");
+                addBotMessage("Let's document this defect. Please provide the <strong>product ID</strong> or name:");
                 updateProgressTracker();
             }, 1000);
         }
@@ -860,19 +1240,43 @@
             setTimeout(() => {
                 removeTypingIndicator();
                 addBotMessage(`
-                    <p>📸 Please upload an image of the defect for analysis.</p>
-                    <p>You can:</p>
-                    <ol style="margin-left: 20px; margin-top: 8px;">
-                        <li>Click the <i class="fas fa-camera"></i> camera button</li>
-                        <li>Drag & drop an image</li>
-                        <li>Take a photo with your device</li>
-                    </ol>
+                    <p>📸 <strong>Image Analysis Mode</strong></p>
+                    <p>Upload a clear image of the defect. I can analyze:</p>
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>Surface defects (scratches, dents)</li>
+                        <li>Material flaws (cracks, discoloration)</li>
+                        <li>Assembly issues (misalignment)</li>
+                    </ul>
+                    <p>Click the <i class="fas fa-camera"></i> button or drag & drop an image.</p>
+                `);
+            }, 1000);
+        }
+
+        // Show Quality Metrics
+        function showQualityMetrics() {
+            toggleAnalytics();
+            
+            showTypingIndicator();
+            setTimeout(() => {
+                removeTypingIndicator();
+                addBotMessage(`
+                    <p>📊 <strong>Quality Metrics Overview</strong></p>
+                    <p>I've opened the analytics panel with real-time quality data:</p>
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>Defect trends over time</li>
+                        <li>Breakdown by defect category</li>
+                        <li>Severity distribution</li>
+                        <li>Production line performance</li>
+                    </ul>
+                    <p>What would you like to analyze next?</p>
                 `);
             }, 1000);
         }
 
         // Handle Product Step
         function handleProductStep(message) {
+            // Check if product exists in database
+            const productInfo = productDatabase[message] || { name: message, specs: "Unknown", criticalParams: [] };
             conversationState.product = message;
             conversationState.step = 'defectType';
             
@@ -880,13 +1284,29 @@
             setTimeout(() => {
                 removeTypingIndicator();
                 
-                // Check if product exists in database (demo)
-                const productName = productDatabase[message] || message;
+                let productHTML = `
+                    <p>📋 <strong>Product Identified</strong></p>
+                    <p>Name: ${productInfo.name}</p>
+                    <p>Specs: ${productInfo.specs}</p>
+                `;
                 
-                addBotMessage(`
-                    <p>📋 Product recorded: <strong>${productName}</strong></p>
-                    <p>What type of defect are we dealing with?</p>
-                `, defectDatabase.types);
+                if (productInfo.criticalParams.length) {
+                    productHTML += `
+                        <p>Critical Quality Parameters:</p>
+                        <ul style="margin-left: 20px; margin-top: 8px;">
+                            ${productInfo.criticalParams.map(param => `<li>${param}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+                
+                productHTML += `
+                    <p>What type of defect are we documenting?</p>
+                    <div class="quick-replies">
+                        ${defectDatabase.types.map(type => `<button class="quick-reply" onclick="sendQuickReply('${type}')">${type}</button>`).join('')}
+                    </div>
+                `;
+                
+                addBotMessage(productHTML);
                 updateProgressTracker();
             }, 1000);
         }
@@ -900,7 +1320,7 @@
                 showTypingIndicator();
                 setTimeout(() => {
                     removeTypingIndicator();
-                    addBotMessage("Please describe the defect in detail:");
+                    addBotMessage("Please describe the defect in detail (include measurements if applicable):");
                 }, 1000);
             } else {
                 conversationState.defectType = message;
@@ -909,14 +1329,22 @@
                 showTypingIndicator();
                 setTimeout(() => {
                     removeTypingIndicator();
+                    
+                    let defectInfo = "";
+                    if (message === "Surface Defect") {
+                        defectInfo = "<p>For surface defects, please include:</p><ul style='margin-left: 20px; margin-top: 8px;'><li>Location on product</li><li>Dimensions (length/depth)</li><li>Photos if available</li></ul>";
+                    }
+                    
                     addBotMessage(`
-                        <p>🔍 Defect type: <strong>${message}</strong></p>
-                        <p>How severe is this defect?</p>
-                    `, [
-                        "Low - Minor issue, doesn't affect functionality",
-                        "Medium - Affects some functionality",
-                        "High - Critical/safety issue"
-                    ]);
+                        <p>🔍 <strong>Defect Type</strong>: ${message}</p>
+                        ${defectInfo}
+                        <p>How would you classify the severity?</p>
+                        <div class="quick-replies">
+                            <button class="quick-reply" onclick="sendQuickReply('Low - Cosmetic only')">Low</button>
+                            <button class="quick-reply" onclick="sendQuickReply('Medium - Functional impact')">Medium</button>
+                            <button class="quick-reply" onclick="sendQuickReply('High - Safety/critical')">High</button>
+                        </div>
+                    `);
                     updateProgressTracker();
                 }, 1000);
             }
@@ -943,14 +1371,17 @@
         function provideDefectSolution() {
             const { product, defectType, severity } = conversationState;
             
-            // Get product name from database or use entered value
-            const productName = productDatabase[product] || product;
+            // Get product info
+            const productInfo = productDatabase[product] || { name: product };
             
             // Get solution (use "Surface Defect" solution for visual defects)
             const solutionType = defectType.includes("Surface") ? "Surface Defect" : 
                                defectType.includes("Custom") ? "Other" : defectType;
-            const solution = defectDatabase.solutions[solutionType]?.[severity] || 
-                           "This defect requires manual review. Please contact quality engineering.";
+            const solution = defectDatabase.solutions[solutionType]?.[severity] || {
+                solution: "This defect requires engineering review.",
+                action: "Document all details and escalate to quality team.",
+                prevention: "Schedule root cause analysis meeting."
+            };
             
             const severityClass = severity === 'medium' ? 'medium' : 
                                 (severity === 'high' ? 'high' : 'low');
@@ -959,19 +1390,22 @@
             
             const solutionHTML = `
                 <div class="solution-card">
-                    <h3><i class="fas fa-lightbulb"></i> Recommended Solution</h3>
-                    <p>${solution}</p>
+                    <h3><i class="fas fa-lightbulb"></i> Quality Control Solution</h3>
+                    <p><strong>Immediate Action:</strong> ${solution.action}</p>
+                    <p><strong>Corrective Solution:</strong> ${solution.solution}</p>
+                    <p><strong>Preventive Measure:</strong> ${solution.prevention}</p>
                 </div>
-                <p>Would you like to report another defect?</p>
+                <p>Would you like to:</p>
                 <div class="quick-replies">
-                    <button class="quick-reply" onclick="sendQuickReply('Yes, report another')">Yes</button>
-                    <button class="quick-reply" onclick="sendQuickReply('No, thanks')">No</button>
+                    <button class="quick-reply" onclick="sendQuickReply('Create defect report')">Create Report</button>
+                    <button class="quick-reply" onclick="sendQuickReply('Analyze another')">Analyze Another</button>
+                    <button class="quick-reply" onclick="sendQuickReply('View metrics')">View Metrics</button>
                 </div>
             `;
             
             addBotMessage(`
                 <p><strong>Defect Analysis Complete</strong></p>
-                <p>Product: ${productName}</p>
+                <p>Product: ${productInfo.name} (${product})</p>
                 <p>Defect: ${defectType.replace("Custom: ", "")} <span class="severity ${severityClass}">${severityText} Severity</span></p>
                 ${solutionHTML}
             `);
@@ -985,7 +1419,6 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 // In a real app, this would upload to an image recognition API
-                // For demo, we'll simulate analysis
                 simulateImageAnalysis(e.target.result, file.name);
             };
             reader.readAsDataURL(file);
@@ -1003,42 +1436,61 @@
                 removeTypingIndicator();
                 
                 // Extract product ID from filename (demo)
-                const productId = fileName.split('_')[0] || 'ABC-123';
-                const productName = productDatabase[productId] || "Unknown Product";
+                const productId = fileName.split('_')[0] || 'VAL-2023';
+                const productInfo = productDatabase[productId] || { name: "Unknown Product" };
                 
                 // Randomly select detected defects (demo)
                 const visualDefects = Object.keys(defectDatabase.visualDefects);
                 const detectedDefects = [];
-                const numDefects = Math.min(Math.floor(Math.random() * 3) + 1, visualDefects.length);
+                const numDefects = Math.min(Math.floor(Math.random() * 2) + 1, visualDefects.length);
                 
                 for (let i = 0; i < numDefects; i++) {
                     const randomIndex = Math.floor(Math.random() * visualDefects.length);
-                    detectedDefects.push(defectDatabase.visualDefects[visualDefects[randomIndex]]);
+                    const defectKey = visualDefects[randomIndex];
+                    detectedDefects.push(defectDatabase.visualDefects[defectKey]);
                 }
                 
                 // Display results
+                let defectsHTML = '';
+                if (detectedDefects.length) {
+                    defectsHTML = `
+                        <p>Detected defects:</p>
+                        <ul style="margin-left: 20px; margin-top: 8px;">
+                            ${detectedDefects.map(defect => `
+                                <li>
+                                    <strong>${defect.type}</strong> 
+                                    <span class="severity ${defect.severity}">${defect.severity.charAt(0).toUpperCase() + defect.severity.slice(1)}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                } else {
+                    defectsHTML = "<p>No major defects detected. Minor cosmetic issues may require visual inspection.</p>";
+                }
+                
                 addBotMessage(`
                     <p>🖼️ <strong>Image Analysis Results</strong></p>
                     <div class="media-attachment">
                         <img src="${imageData}" class="media-image" onclick="openImageModal('${imageData}')">
                         <p class="media-caption">Uploaded image: ${fileName}</p>
                     </div>
-                    <p>Product identified: <strong>${productName}</strong> (ID: ${productId})</p>
-                    <p>Detected defects:</p>
-                    <ul style="margin-left: 20px; margin-top: 8px;">
-                        ${detectedDefects.map(defect => `<li>${defect}</li>`).join('')}
-                    </ul>
-                    <p>Would you like to document these defects?</p>
+                    <p>Product identified: <strong>${productInfo.name}</strong> (ID: ${productId})</p>
+                    ${defectsHTML}
+                    <p>Would you like to document these findings?</p>
                     <div class="quick-replies">
-                        <button class="quick-reply" onclick="sendQuickReply('Yes, document defects')">Yes</button>
-                        <button class="quick-reply" onclick="sendQuickReply('No, just analyzing')">No</button>
+                        <button class="quick-reply" onclick="sendQuickReply('Document defects')">Yes</button>
+                        <button class="quick-reply" onclick="sendQuickReply('Just analyzing')">No</button>
                     </div>
                 `);
                 
-                // If user wants to document, start defect report with pre-filled data
+                // If user wants to document, pre-fill defect info
+                if (detectedDefects.length) {
+                    conversationState.product = productId;
+                    conversationState.defectType = detectedDefects[0].type;
+                    conversationState.severity = detectedDefects[0].severity;
+                }
+                
                 conversationState.imageAnalysis = false;
-                conversationState.product = productId;
-                conversationState.defectType = detectedDefects[0] || "Surface Defect";
             }, 2000);
         }
 
@@ -1068,10 +1520,11 @@
             showTypingIndicator();
             setTimeout(() => {
                 removeTypingIndicator();
-                addBotMessage("How else can I assist you with quality control today?", [
+                addBotMessage("What would you like to do next?", [
                     "Report a new defect",
-                    "Analyze another image",
-                    "View quality metrics"
+                    "Analyze product image",
+                    "View quality dashboard",
+                    "Check defect trends"
                 ]);
                 updateProgressTracker();
             }, 1000);
@@ -1085,7 +1538,8 @@
                 addBotMessage("I can help you with:", [
                     "Defect reporting and analysis",
                     "Image-based defect detection",
-                    "Quality control procedures"
+                    "Quality metrics visualization",
+                    "Root cause investigation"
                 ]);
             }, 1000);
         }
@@ -1096,40 +1550,14 @@
             processConversationStep(message);
         }
 
-        // Toggle Voice Recognition
-        function toggleVoiceRecognition() {
-            if (!recognition) {
-                addBotMessage("Voice commands are not supported in your browser. Please use text input.");
-                return;
-            }
-
-            if (isListening) {
-                stopVoiceRecognition();
-            } else {
-                startVoiceRecognition();
-            }
+        // Toggle Analytics Panel
+        function toggleAnalytics() {
+            analyticsPanel.classList.toggle('active');
         }
 
-        // Start Voice Recognition
-        function startVoiceRecognition() {
-            try {
-                recognition.start();
-                voiceBtn.classList.add('listening');
-                voiceStatus.classList.add('active');
-                isListening = true;
-                messageInput.placeholder = "Listening... Speak now";
-            } catch (e) {
-                console.error("Voice recognition error:", e);
-                addBotMessage("Error starting voice recognition. Please try again or type your message.");
-            }
-        }
-
-        // Stop Voice Recognition
-        function stopVoiceRecognition() {
-            voiceBtn.classList.remove('listening');
-            voiceStatus.classList.remove('active');
-            isListening = false;
-            messageInput.placeholder = "Type or speak your message...";
+        // Toggle Sidebar
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
         }
 
         // Toggle Dark/Light Theme
@@ -1138,6 +1566,36 @@
             const isDark = document.body.classList.contains('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            
+            // Update charts for theme change
+            updateChartThemes();
+        }
+
+        // Update Chart Themes
+        function updateChartThemes() {
+            const isDark = document.body.classList.contains('dark-mode');
+            const textColor = isDark ? '#f8f9fa' : '#2b2d42';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            
+            // Update Chart.js charts
+            const charts = [defectTrendChart, defectCategoryChart, severityChart];
+            charts.forEach(chart => {
+                chart.options.scales.x.grid.color = gridColor;
+                chart.options.scales.y.grid.color = gridColor;
+                chart.options.scales.x.ticks.color = textColor;
+                chart.options.scales.y.ticks.color = textColor;
+                if (chart.options.plugins?.legend?.labels) {
+                    chart.options.plugins.legend.labels.color = textColor;
+                }
+                chart.update();
+            });
+            
+            // Update ApexCharts
+            linePerformanceChart.updateOptions({
+                theme: {
+                    mode: isDark ? 'dark' : 'light'
+                }
+            });
         }
 
         // Add User Message
@@ -1256,16 +1714,16 @@
         // Drag and drop image functionality
         document.addEventListener('dragover', (e) => {
             e.preventDefault();
-            chatContainer.classList.add('drag-over');
+            document.body.classList.add('drag-over');
         });
 
         document.addEventListener('dragleave', () => {
-            chatContainer.classList.remove('drag-over');
+            document.body.classList.remove('drag-over');
         });
 
         document.addEventListener('drop', (e) => {
             e.preventDefault();
-            chatContainer.classList.remove('drag-over');
+            document.body.classList.remove('drag-over');
             
             if (e.dataTransfer.files.length) {
                 const file = e.dataTransfer.files[0];
