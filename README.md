@@ -50,24 +50,6 @@ The Quality Control Tracker is an interactive chatbot designed to streamline the
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 - Internet connection
 
-### Installation ⚙️
-1. Clone the repository
-   ```
-   git clone https://github.com/your-org/quality-control-tracker.git
-   ```
-2. Navigate to the project directory
-   ```
-   cd quality-control-tracker
-   ```
-3. Install dependencies
-   ```
-   npm install
-   ```
-4. Start the development server
-   ```
-   npm start
-   ```
-
 ## Usage 📱
 
 1. **Start a New Report** ➡️ Click "New Defect Report" to begin the process
